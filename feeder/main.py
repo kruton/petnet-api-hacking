@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import sys
 from pathlib import Path
 
 from fastapi import FastAPI, Request, HTTPException
@@ -17,10 +18,14 @@ logger = logging.getLogger("feeder")
 
 def handle_exception(loop, context):
     if "exception" in context:
-        logging.error("Caught global exception:", exc_info=context["exception"])
+        # Check if we are in an exception handler
+        exc_info = sys.exc_info()
+        if exc_info is not None and exc_info != (None, None, None):
+            logger.exception("Caught global exception: %r", context["exception"])
+        else:
+            logger.error("Caught global exception: %r", context["exception"])
     else:
-        msg = context["message"]
-        logging.error("Caught global exception: %s", msg)
+        logger.error("Caught global exception: %r", context["message"])
 
 
 frontend = Path("./static/build/index.html")
