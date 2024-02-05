@@ -6,8 +6,8 @@ import string
 from typing import List
 
 import semver
-from hbmqtt.client import MQTTClient
-from hbmqtt.mqtt.constants import QOS_2
+from amqtt.client import MQTTClient
+from amqtt.mqtt.constants import QOS_2
 
 from feeder.database.models import (
     KronosDevices,
@@ -200,7 +200,7 @@ class FeederClient(MQTTClient):
         # TODO: Actually figure out when they implemented the newer scheduling API...
         # We know >=2.7 uses the new API and that 2.3.2 uses the legacy API.
         # Assuming 2.5.X because that is smack dab in between 3 and 7.
-        if semver.compare("2.5.0", software_version) == 1:
+        if semver.VersionInfo.parse("2.5.0").compare(software_version) == 1:
             # If we are running on 2.4.0 or lower, use the legacy scheduling API
             await self.send_cmd(gateway_id, device_id, "schedule", schedule_array)
         else:
@@ -226,9 +226,7 @@ class FeederClient(MQTTClient):
             await self.send_cmd(gateway_id, device_id, "schedule_mod_end", {})
 
     async def start(self):
-        await self.connect(
-            "mqtt://%s:%s@localhost:1883/" % (local_username, local_password)
-        )
+        await self.connect(f"mqtt://{local_username}:{local_password}@localhost:1883/")
         await self.subscribe([("#", QOS_2)])
         try:
             while True:

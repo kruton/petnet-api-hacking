@@ -33,14 +33,10 @@ async def render_frontend(full_path: str, request: Request):
         raise HTTPException(status_code=404)
 
     if frontend.exists():
-        build_path = "build"
-        if settings.app_root:
-            build_path = f"{settings.app_root[1:]}/build"
         return frontend_template.TemplateResponse(
             "index.html",
             {
                 "request": request,
-                "build_path": build_path,
                 "root_path": settings.app_root,
             },
         )
@@ -84,7 +80,7 @@ def create_application() -> FastAPI:
 
     @app.on_event("shutdown")
     async def shutdown_event():  # pylint: disable=unused-variable
-        await asyncio.gather([await broker.shutdown()], return_exceptions=True)
+        await asyncio.gather(broker.shutdown(), return_exceptions=True)
         await db.disconnect()
 
     app.add_api_route(

@@ -2,11 +2,11 @@ import re
 import logging
 from secrets import token_hex
 
-from hbmqtt.plugins.authentication import BaseAuthPlugin
+from amqtt.plugins.authentication import BaseAuthPlugin
 from feeder.database.models import KronosGateways
 
 logger = logging.getLogger(__name__)
-local_username = "local_%s" % token_hex(8)
+local_username = f"local_{token_hex(8)}"
 local_password = token_hex(16)
 
 
